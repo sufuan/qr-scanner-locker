@@ -32,11 +32,12 @@ const ScanQR = () => {
 
         if (data) {
             setResult(data);
+           const jsondata=JSON.parse(data)
 
             const newqrdata = {
 
-                result: data,
-                userId
+                 jsondata,
+                  userId
 
             }
             console.log(newqrdata)

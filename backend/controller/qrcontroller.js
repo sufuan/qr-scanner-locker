@@ -28,12 +28,18 @@ exports.qrcode = async (req, res, next) => {
             return res.status(404).send('User not found');
         }
 
+        const identifier = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+
+
+
         const userId = user._id
 
         const passtoqr = {
             qrText,
             email,
-            userId
+            userId,
+            identifier
         }
 
         // console.log(passtoqr)
@@ -74,7 +80,7 @@ exports.qrcode = async (req, res, next) => {
 
 
 
-        const newdata = { qrCode, userId }
+        const newdata = { qrCode, userId, identifier }
 
 
 
@@ -96,18 +102,38 @@ exports.qrcode = async (req, res, next) => {
 
 
 
+
+
+
+
+
 exports.verifyQrCode = async (req, res, next) => {
-    const { result, userId, vehicleId } = req.body
+    const { jsondata, vehicleId } = req.body
+    const identifier = (req.body.jsondata.identifier)
 
+  
 
+   
 
     try {
-        const vehicles = await Vehicle.find({ userId, _id: vehicleId }).populate('userId', '-password')
-        // res.send(vehicles)
 
-        // const qrCodeImages = vehicles.map(vehicle => vehicle.qrCode);
 
+       
+
+        const vehicles = await Vehicle.find({identifier}).populate('userId', '-password')
+       
+        
+        if (vehicles.length === 0) {
+            return res.send('no data')
+        }
+        
+
+
+        // vehicles will give me array of object  . i need qrCode inside array of obj .
+        
         const vehicle = vehicles[0];
+
+      
 
         // Retrieve the QR code image for the filtered vehicle
         const base64String = vehicle.qrCode;
@@ -120,7 +146,7 @@ exports.verifyQrCode = async (req, res, next) => {
 
         const postDataStringify = JSON.stringify(postData).replace(/\s/g, '')
 
-        console.log('postdata strng 1', postDataStringify)
+        // console.log('postdata strng 1', postDataStringify)
 
 
         async function readQRCodeFromDataURL(dataURL) {
@@ -140,7 +166,7 @@ exports.verifyQrCode = async (req, res, next) => {
 
 
 
-        // console.log('before clean ',qrCode)
+
 
 
 
@@ -163,13 +189,13 @@ exports.verifyQrCode = async (req, res, next) => {
 
         const cleanPostData = removeWhitespace(postDataStringify)
 
-        console.log('after clean post', cleanPostData);
+        // console.log('after clean post', cleanPostData);
 
         const datas = JSON.parse(cleanedQRData);
         const compactData = JSON.stringify(datas).replace(/\s+/g, '');
 
 
-        console.log('after clean qr ' , compactData)
+        // console.log('after clean qr ', compactData)
 
 
 
@@ -180,7 +206,6 @@ exports.verifyQrCode = async (req, res, next) => {
         // }
 
 
-        // Compare qrCodeData and postData to check if they match 
 
 
         if ((compactData) === (cleanPostData)) {

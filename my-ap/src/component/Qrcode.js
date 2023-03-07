@@ -27,7 +27,7 @@ const Qrcode = () => {
 
     axios.post('http://localhost:5000/scanqrcode', values)
       .then(res => {
-        console.log(res.data.data.qrCode)
+        console.log(res.data)
         setQrimage(res.data?.data?.qrCode)
       })
 

@@ -5,7 +5,7 @@ const vehicleSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
-        trim:true
+        trim: true
     },
     // vehicleInfo: {
     //     type: String,
@@ -14,14 +14,22 @@ const vehicleSchema = new mongoose.Schema({
     qrCode: {
         type: String,
         required: true,
-        trim:true
+        trim: true
+    },
+    identifier: {
+        type: String,
+        required: true,
+        trim: true
     },
     locked: {
         type: Boolean,
         default: false
     }
-})
+},
+    { timestamps: true }
+)
 
-const Vehicle  = mongoose.model('Vehicle', vehicleSchema)
+
+const Vehicle = mongoose.model('Vehicle', vehicleSchema)
 
 module.exports = Vehicle
