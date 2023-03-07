@@ -128,11 +128,7 @@ exports.verifyQrCode = async (req, res, next) => {
             return obj;
         }
 
-        const data = {
-            qrText: ' sdf sdf ',
-            email: 'avd ddd vu@gma.com',
-            userId: ' 6405a956b22a6bb3c56cd94c '
-        };
+      
 
         const cleanedQRData = removeWhitespace(qrCode);
 
@@ -157,16 +153,14 @@ exports.verifyQrCode = async (req, res, next) => {
 
 
 
-       const rep = JSON.parse(cleanedQRData);
+      
 
-        const cleanedQRDataStr = JSON.stringify(qrCode).replace(/\s/g, '');
 
-        // console.log(qrCodestringify)
 
-        const stableJsonString1 = jsonStableStringify(cleanedQRDataStr).replace(/\s/g, '');
+     
         // const stableJsonString2 = jsonStableStringify(qrCodestringify).replace(/\s/g, '');
 
-        console.log(stableJsonString1)
+        // console.log(stableJsonString1)
 
         // if (crypto.timingSafeEqual(Buffer.from(stableJsonString1), Buffer.from(stableJsonString2))) {
         //     console.log('Objects are equal');
