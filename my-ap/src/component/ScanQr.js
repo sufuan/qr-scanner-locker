@@ -32,19 +32,19 @@ const ScanQR = () => {
 
         if (data) {
             setResult(data);
-           const jsondata=JSON.parse(data)
+           const qrData=JSON.parse(data)
 
             const newqrdata = {
 
-                 jsondata,
+                 qrData,
                   userId
 
             }
             console.log(newqrdata)
             // Send result to backend API
             try {
-                await axios.post(`http://localhost:5000/api/verifycode`, newqrdata);
-                console.log('Data sent to backend successfully');
+              const res =  await axios.post(`http://localhost:5000/api/verifycode`, newqrdata);
+                console.log(res);
             } catch (error) {
                 console.error('Failed to send data to backend:', error);
             }

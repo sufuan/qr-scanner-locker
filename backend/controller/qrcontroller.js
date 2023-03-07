@@ -107,131 +107,148 @@ exports.qrcode = async (req, res, next) => {
 
 
 
+// exports.verifyQrCode = async (req, res, next) => {
+//     const { jsondata, vehicleId } = req.body
+//     const identifier = (req.body.jsondata.identifier)
+
+//     try {
+
+//         const vehicles = await Vehicle.find({ identifier }).populate('userId', '-password')
+
+
+//         if (vehicles.length === 0) {
+//             return res.send('no data')
+//         }
+//         // vehicles will give me array of object  . i need qrCode inside array of obj .
+
+//         const vehicle = vehicles[0];
+
+//         // Retrieve the QR code image for the filtered vehicle
+//         const base64String = vehicle.qrCode;
+
+
+
+//         const postDataStringify = JSON.stringify(jsondata).replace(/\s/g, '')
+
+//         async function readQRCodeFromDataURL(dataURL) {
+//             const image = await loadImage(dataURL);
+//             const canvas = createCanvas(image.width, image.height);
+//             const context = canvas.getContext('2d');
+//             context.drawImage(image, 0, 0);
+//             const imageData = context.getImageData(0, 0, image.width, image.height);
+//             const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+//             return qrCode ? qrCode.data : null;
+//         }
+
+
+//         const qrCode = await readQRCodeFromDataURL(base64String);
+
+//         function removeWhitespace(obj) {
+//             for (let prop in obj) {
+//                 if (typeof obj[prop] === 'string') {
+//                     obj[prop] = obj[prop].replace(/\s/g, '');
+//                 } else if (typeof obj[prop] === 'object') {
+//                     removeWhitespace(obj[prop]);
+//                 }
+//             }
+//             return obj;
+//         }
+
+//         const cleanedQRData = removeWhitespace(qrCode);
+//         const cleanPostData = removeWhitespace(postDataStringify)
+//         const datas = JSON.parse(cleanedQRData);
+//         const compactData = JSON.stringify(datas).replace(/\s+/g, '');
+
+//         // if (crypto.timingSafeEqual(Buffer.from(stableJsonString1), Buffer.from(stableJsonString2))) {
+//         //     console.log('Objects are equal');
+//         // } else {
+//         //     console.log('Objects are not equal');
+//         // }
+
+//         if ((compactData) === (cleanPostData)) {
+//             res.status(200).json({
+//                 message: "QR code data and post data match. Verification successful.",
+//                 success: true
+//             })
+//         } else {
+//             res.send("QR code data and post data do not match. Verification failed.");
+//         }
+
+
+
+//     } catch (error) {
+//         console.log(error)
+//     }
+
+// }
+
+
+
+
 exports.verifyQrCode = async (req, res, next) => {
-    const { jsondata, vehicleId } = req.body
-    const identifier = (req.body.jsondata.identifier)
+    const { qrData, vehicleId } = req.body;
 
-  
-
-   
+    console.log(req.body)
+    const identifier = qrData.identifier;
 
     try {
-
-
-       
-
-        const vehicles = await Vehicle.find({identifier}).populate('userId', '-password')
-       
-        
+        const vehicles = await Vehicle.find({ identifier }).populate('userId', '-password');
         if (vehicles.length === 0) {
-            return res.send('no data')
+            return res.status(404).json({ message: 'Vehicle not found' });
         }
-        
 
-
-        // vehicles will give me array of object  . i need qrCode inside array of obj .
-        
         const vehicle = vehicles[0];
+        const qrCodeBase64 = vehicle.qrCode;
 
-      
+        const postDataStringified = JSON.stringify(qrData).replace(/\s/g, '');
+        const cleanedPostData = removeWhitespace(postDataStringified);
 
-        // Retrieve the QR code image for the filtered vehicle
-        const base64String = vehicle.qrCode;
+        const qrCodeData = await readQRCodeFromDataURL(qrCodeBase64);
+        const cleanedQrCodeData = removeWhitespace(qrCodeData);
 
-        const postData = {
-            "qrText": "sdf sdf",
-            "email": "avddddvu@gma. com",
-            "userId": "6405a956b22a6bb3c5 6cd94c"
-        }
+        const qrDataObj = JSON.parse(cleanedQrCodeData);
+        const compactQrData = JSON.stringify(qrDataObj).replace(/\s+/g, '');
 
-        const postDataStringify = JSON.stringify(postData).replace(/\s/g, '')
-
-        // console.log('postdata strng 1', postDataStringify)
-
-
-        async function readQRCodeFromDataURL(dataURL) {
-            const image = await loadImage(dataURL);
-            const canvas = createCanvas(image.width, image.height);
-            const context = canvas.getContext('2d');
-            context.drawImage(image, 0, 0);
-            const imageData = context.getImageData(0, 0, image.width, image.height);
-            const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
-            return qrCode ? qrCode.data : null;
-        }
-
-
-        const qrCode = await readQRCodeFromDataURL(base64String);
-
-
-
-
-
-
-
-
-
-
-
-        function removeWhitespace(obj) {
-            for (let prop in obj) {
-                if (typeof obj[prop] === 'string') {
-                    obj[prop] = obj[prop].replace(/\s/g, '');
-                } else if (typeof obj[prop] === 'object') {
-                    removeWhitespace(obj[prop]);
-                }
-            }
-            return obj;
-        }
-
-
-
-        const cleanedQRData = removeWhitespace(qrCode);
-
-        const cleanPostData = removeWhitespace(postDataStringify)
-
-        // console.log('after clean post', cleanPostData);
-
-        const datas = JSON.parse(cleanedQRData);
-        const compactData = JSON.stringify(datas).replace(/\s+/g, '');
-
-
-        // console.log('after clean qr ', compactData)
-
-
-
-        // if (crypto.timingSafeEqual(Buffer.from(stableJsonString1), Buffer.from(stableJsonString2))) {
-        //     console.log('Objects are equal');
-        // } else {
-        //     console.log('Objects are not equal');
-        // }
-
-
-
-
-        if ((compactData) === (cleanPostData)) {
-            res.send("QR code data and post data match. Verification successful.");
+        if (areObjectsEqual(cleanedPostData, compactQrData)) {
+            res.status(200).json({
+                message: 'QR code data and post data match. Verification successful.',
+                success: true
+            });
         } else {
-            res.send("QR code data and post data do not match. Verification failed.");
+            res.status(400).json({ message: 'QR code data and post data do not match. Verification failed.' });
         }
-
-
-        // res.send(qrCode);
-
-
-
-
-
-
-
-
-
-
 
     } catch (error) {
-        console.log(error)
+        console.error('Error verifying QR code:', error);
+        res.status(500).json({ message: 'An error occurred while verifying the QR code.' });
     }
+};
 
+function removeWhitespace(obj) {
+    for (let prop in obj) {
+        if (typeof obj[prop] === 'string') {
+            obj[prop] = obj[prop].replace(/\s/g, '');
+        } else if (typeof obj[prop] === 'object') {
+            removeWhitespace(obj[prop]);
+        }
+    }
+    return obj;
 }
+
+async function readQRCodeFromDataURL(dataURL) {
+    const image = await loadImage(dataURL);
+    const canvas = createCanvas(image.width, image.height);
+    const context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0);
+    const imageData = context.getImageData(0, 0, image.width, image.height);
+    const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+    return qrCode ? qrCode.data : null;
+}
+
+function areObjectsEqual(obj1, obj2) {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+}
+
 
 
 
