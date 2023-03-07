@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ScanByCamera from './ScanByCamera';
 import ScanByUpload from './ScanbyUpload';
 import axios from 'axios'
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const ScanQR = () => {
 
@@ -11,11 +12,14 @@ const ScanQR = () => {
 
     const [result, setResult] = useState(null)
 
-      const user = useSelector(state=>state.auth)
-      console.log(user)
-    //   const userId= user.user.data._id
+    const user = useSelector(state => state.auth)
+   
+    const userId = user?.user?.data?._id
 
-    //   console.log(userId)   
+  
+
+  
+
 
 
     const handleSelectOption = (isCameraSelected) => {
@@ -23,17 +27,28 @@ const ScanQR = () => {
     }
 
 
-    const handleScanResult = async (result) => {
-    
-        if (result) {
-            setResult(result);
+    const handleScanResult = async (data) => {
+        // console.log(data)
+
+        if (data) {
+            setResult(data);
+
+            const newqrdata = {
+
+                result: data,
+                userId
+
+            }
+            console.log(newqrdata)
             // Send result to backend API
             try {
-                await axios.post(`http://localhost:5000/api/verifycode`, { result });
+                await axios.post(`http://localhost:5000/api/verifycode`, newqrdata);
                 console.log('Data sent to backend successfully');
             } catch (error) {
                 console.error('Failed to send data to backend:', error);
             }
+
+
         }
         else {
             console.log('no data received')
@@ -42,7 +57,9 @@ const ScanQR = () => {
     };
 
 
-    // console.log(isUsingCamera)
+
+
+
     return (
         <div>
             <div>
@@ -66,7 +83,7 @@ export default ScanQR;
 
 
 
-
+ // 
 
 
 

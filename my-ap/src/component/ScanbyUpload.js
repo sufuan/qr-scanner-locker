@@ -12,7 +12,7 @@ const fileRef = useRef()
 
 const handleClick=()=>{
     fileRef.current.click()
-    console.log(file)
+   
 
   }
 
@@ -20,27 +20,22 @@ const handleClick=()=>{
   const handleChange = async(e)=>{
    const  file= (e.target.files[0])
    setFile(file)
-   const result = await QrScanner.scanImage(file)
-   console.log(result)
-   onScanResult(result)
+   const data = await QrScanner.scanImage(file)
 
+   onScanResult(data)
+   
   }
 
     return (
-        <div>
-               <button onClick={handleClick} className='btn '>qr scan
+        <div className='mt-4'>
+               <button onClick={handleClick} className=''>qr scan
                 <input
                 type='file' accept='.png, .jpg, .jpeg '
-
+                    className='hidden'
                 onChange={handleChange}
 
                 ref={fileRef}
-                className='block w-full text-sm text-slate-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-full file:border-0
-                file:text-sm file:font-semibold
-                file:bg-violet-50 file:text-violet-700
-                hover:file:bg-violet-100'
+               
 
                 />
                </button>
