@@ -36,12 +36,41 @@ exports.qrcode = async (req, res, next) => {
             userId
         }
 
+        // console.log(passtoqr)
 
 
 
-        const jsonData = JSON.stringify(passtoqr);
+        //         const data = { name: 'John', age: 30 };
+        // const jsonString = JSON.stringify(data, (key, value) => (typeof value === 'string' ? value.trim() : value));
+        // jsonString will be '{"name":"John","age":30}' without any whitespace in the string
+
+
+
+
+
+        function removeWhitespace(obj) {
+            for (let prop in obj) {
+                if (typeof obj[prop] === 'string') {
+                    obj[prop] = obj[prop].replace(/\s/g, '');
+                } else if (typeof obj[prop] === 'object') {
+                    removeWhitespace(obj[prop]);
+                }
+            }
+            return obj;
+        }
+
+        const cleanedQRData = removeWhitespace(passtoqr);
+
+
+        const jsonData = JSON.stringify(cleanedQRData);
+
+
+        // console.log('after', jsonData)
+
+
+
+
         const qrCode = await Qrcode.toDataURL(jsonData);
-
 
 
 
@@ -91,7 +120,7 @@ exports.verifyQrCode = async (req, res, next) => {
 
         const postDataStringify = JSON.stringify(postData).replace(/\s/g, '')
 
-        // console.log('postdata', postDataStringify)
+        console.log('postdata strng 1', postDataStringify)
 
 
         async function readQRCodeFromDataURL(dataURL) {
@@ -111,7 +140,7 @@ exports.verifyQrCode = async (req, res, next) => {
 
 
 
-        console.log(qrCode)
+        // console.log('before clean ',qrCode)
 
 
 
@@ -128,39 +157,21 @@ exports.verifyQrCode = async (req, res, next) => {
             return obj;
         }
 
-      
+
 
         const cleanedQRData = removeWhitespace(qrCode);
 
-        console.log(cleanedQRData);
+        const cleanPostData = removeWhitespace(postDataStringify)
+
+        console.log('after clean post', cleanPostData);
+
+        const datas = JSON.parse(cleanedQRData);
+        const compactData = JSON.stringify(datas).replace(/\s+/g, '');
 
 
+        console.log('after clean qr ' , compactData)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-
-
-
-     
-        // const stableJsonString2 = jsonStableStringify(qrCodestringify).replace(/\s/g, '');
-
-        // console.log(stableJsonString1)
 
         // if (crypto.timingSafeEqual(Buffer.from(stableJsonString1), Buffer.from(stableJsonString2))) {
         //     console.log('Objects are equal');
@@ -169,12 +180,14 @@ exports.verifyQrCode = async (req, res, next) => {
         // }
 
 
-        // Compare qrCodeData and postData to check if they match
-        // if ((qrCodestringify) === (postDataStringify)) {
-        //     res.send("QR code data and post data match. Verification successful.");
-        // } else {
-        //     res.send("QR code data and post data do not match. Verification failed.");
-        // }
+        // Compare qrCodeData and postData to check if they match 
+
+
+        if ((compactData) === (cleanPostData)) {
+            res.send("QR code data and post data match. Verification successful.");
+        } else {
+            res.send("QR code data and post data do not match. Verification failed.");
+        }
 
 
         // res.send(qrCode);

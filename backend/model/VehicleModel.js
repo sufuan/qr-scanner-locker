@@ -4,7 +4,8 @@ const vehicleSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: true,
+        trim:true
     },
     // vehicleInfo: {
     //     type: String,
@@ -12,7 +13,8 @@ const vehicleSchema = new mongoose.Schema({
     // },
     qrCode: {
         type: String,
-        required: true
+        required: true,
+        trim:true
     },
     locked: {
         type: Boolean,
