@@ -36,8 +36,15 @@ const handleLogOut=()=>{
             <div className='flex gap-4 text-xl '>
                 <NavLink to='/' className={({ isActive }) => isActive ? 'text-emerald-400' : 'black'}>Home</NavLink>
 
-                <NavLink to='/register' className={({ isActive }) => isActive ? 'text-emerald-400' : 'black'}>Register</NavLink>
                 <NavLink to='/scanqr' className={({ isActive }) => isActive ? 'text-emerald-400' : 'black'}>Scan </NavLink>
+
+                  {
+
+                    user ? <p>Hello</p> : <NavLink to='/register' className={({ isActive }) => isActive ? 'text-emerald-400' : 'black'}>Register</NavLink>
+                  }
+                
+
+
 
 
 

@@ -13,12 +13,12 @@ const ScanQR = () => {
     const [result, setResult] = useState(null)
 
     const user = useSelector(state => state.auth)
-   
+
     const userId = user?.user?.data?._id
 
-  
 
-  
+
+
 
 
 
@@ -27,35 +27,70 @@ const ScanQR = () => {
     }
 
 
-    const handleScanResult = async (data) => {
-        // console.log(data)
+    // const handleScanResult = async (data) => {
+    //     // console.log(data)
 
+    //     if (data) {
+    //         setResult(data);
+    //        const qrData=JSON.parse(data)
+
+    //         const newqrdata = {
+
+    //              qrData,
+    //               userId
+
+    //         }
+    //         console.log(newqrdata)
+    //         // Send result to backend API
+    //         try {
+    //           const res =  await axios.post(`http://localhost:5000/api/verifycode`, newqrdata);
+    //             console.log(res);
+    //         } catch (error) {
+    //             console.error('suspicios qr ', error);
+    //         }
+
+    //     }
+    //     else {
+    //         console.log('no data received')
+    //     }
+
+    // };
+
+
+
+    const handleScanResult = async (data) => {
         if (data) {
             setResult(data);
-           const qrData=JSON.parse(data)
+            let qrData;
+            try {
+                qrData = JSON.parse(data);
+            } catch (error) {
+                console.error("Error parsing QR datasss", error);
+                return;
+            }
 
             const newqrdata = {
+                qrData,
+                userId,
+            };
 
-                 qrData,
-                  userId
+            console.log(newqrdata);
 
-            }
-            console.log(newqrdata)
             // Send result to backend API
             try {
-              const res =  await axios.post(`http://localhost:5000/api/verifycode`, newqrdata);
+                const res = await axios.post(
+                    `http://localhost:5000/api/verifycode`,
+                    newqrdata
+                );
                 console.log(res);
             } catch (error) {
-                console.error('Failed to send data to backend:', error);
+                console.error("Error sending QR data to API", error);
             }
-
-
+        } else {
+            console.log("No data received");
         }
-        else {
-            console.log('no data received')
-        }
-
     };
+
 
 
 
